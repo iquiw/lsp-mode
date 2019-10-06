@@ -763,6 +763,60 @@ responsiveness at the cost of possibile stability issues."
  (make-lsp-client :new-connection (lsp-stdio-connection lsp-clients-crystal-executable)
                   :major-modes '(crystal-mode)
                   :server-id 'scry))
+
+
+;; JSON
+(defgroup lsp-json nil
+  "LSP support for JSON, using vscode-json-languageserver."
+  :group 'lsp-mode
+  :link '(url-link "https://github.com/vscode-langservers/vscode-json-languageserver"))
+
+(defcustom lsp-clients-json-server "vscode-json-languageserver"
+  "The vscode-json-languageserver executable to use.
+Leave as just the executable name to use the default behavior of
+finding the executable with `exec-path'."
+  :group 'lsp-json
+  :risky t
+  :type 'file)
+
+(defcustom lsp-clients-json-server-args '("--stdio")
+  "Extra arguments for the vscode-json-languageserver language server."
+  :group 'lsp-json
+  :risky t
+  :type '(repeat string))
+
+(defcustom lsp-clients-json-format-enable t
+  "Enable/disable default JSON formatter."
+  :group 'lsp-json
+  :type 'boolean)
+
+(defcustom lsp-clients-json-schemas nil
+  "Associate schemas to JSON files in the current project."
+  :group 'lsp-json
+  :type '(repeat alist))
+
+(defcustom lsp-clients-json-trace-server "off"
+  "Traces the communication between VS Code and the JSON language server."
+  :group 'lsp-json
+  :type '(choice (:tag "off" "messages" "verbose")))
+
+(lsp-register-custom-settings
+ '(("json.format.enable" lsp-clients-json-format-enable t)
+   ("json.schemas" lsp-clients-json-schemas)
+   ("json.trace.server" lsp-clients-json-trace-server)))
+
+(lsp-register-client
+ (make-lsp-client :new-connection (lsp-stdio-connection (lambda ()
+                                                          (cons lsp-clients-json-server
+                                                                lsp-clients-json-server-args)))
+                  :major-modes '(json-mode)
+                  :priority -1
+                  :server-id 'json
+                  :initialization-options '(:provideFormatter nil)
+                  :initialized-fn (lambda (workspace)
+                    (with-lsp-workspace workspace
+                      (lsp--set-configuration (lsp-configuration-section "json"))))))
+
 
 (provide 'lsp-clients)
 ;;; lsp-clients.el ends here
