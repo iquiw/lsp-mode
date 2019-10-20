@@ -800,6 +800,22 @@ finding the executable with `exec-path'."
   :group 'lsp-json
   :type '(choice (:tag "off" "messages" "verbose")))
 
+(defvar lsp-clients-json--schema-associations
+  '(("/*.schema.json" . [ "http://json-schema.org/draft-07/schema#" ])
+    ("/.babelrc" . [ "http://json.schemastore.org/babelrc" ])
+    ("/.babelrc.json" . [ "http://json.schemastore.org/babelrc" ])
+    ("/bower.json" . [ "http://json.schemastore.org/bower" ])
+    ("/.bowerrc" . [ "http://json.schemastore.org/bowerrc" ])
+    ("/composer.json" . [ "https://getcomposer.org/schema.json" "http://json.schemastore.org/composer" ])
+    ("/jsconfig.json" . [ "http://json.schemastore.org/jsconfig" ])
+    ("/jsconfig.*.json" . [ "http://json.schemastore.org/jsconfig" ])
+    ("/package.json" . [ "http://json.schemastore.org/package" ])
+    ("/tsconfig.json" . [ "http://json.schemastore.org/tsconfig" ])
+    ("/tsconfig.*.json" . [ "http://json.schemastore.org/tsconfig" ])
+    ("/tsconfig-*.json" . [ "http://json.schemastore.org/tsconfig" ])
+    ("/tslint.json" . [ "http://json.schemastore.org/tslint" ])
+    ("/typings.json" . [ "http://json.schemastore.org/typings" ])))
+
 (lsp-register-custom-settings
  '(("json.format.enable" lsp-clients-json-format-enable t)
    ("json.schemas" lsp-clients-json-schemas)
@@ -815,7 +831,8 @@ finding the executable with `exec-path'."
                   :initialization-options '(:provideFormatter nil)
                   :initialized-fn (lambda (workspace)
                     (with-lsp-workspace workspace
-                      (lsp--set-configuration (lsp-configuration-section "json"))))))
+                      (lsp--set-configuration (lsp-configuration-section "json"))
+                      (lsp-notify "json/schemaAssociations" lsp-clients-json--schema-associations)))))
 
 
 (provide 'lsp-clients)
